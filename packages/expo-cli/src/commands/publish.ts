@@ -47,12 +47,12 @@ export async function action(
   // This gives the user sometime to bail out if the info is unexpected.
 
   if (sdkVersion && target === 'managed') {
-    log(`- Expo SDK: ${log.chalk.bold(exp.sdkVersion)}`);
+    log.log(`- Expo SDK: ${log.chalk.bold(exp.sdkVersion)}`);
   }
-  log(`- Release channel: ${log.chalk.bold(options.releaseChannel)}`);
-  log(`- Workflow: ${log.chalk.bold(target.replace(/\b\w/g, l => l.toUpperCase()))}`);
+  log.log(`- Release channel: ${log.chalk.bold(options.releaseChannel)}`);
+  log.log(`- Workflow: ${log.chalk.bold(target.replace(/\b\w/g, l => l.toUpperCase()))}`);
   if (user.kind === 'robot') {
-    log(`- Owner: ${log.chalk.bold(owner)}`);
+    log.log(`- Owner: ${log.chalk.bold(owner)}`);
   }
 
   log.newLine();
@@ -80,7 +80,7 @@ export async function action(
 
   // Build and publish the project.
 
-  log(`Building optimized bundles and generating sourcemaps...`);
+  log.log(`Building optimized bundles and generating sourcemaps...`);
 
   if (options.quiet) {
     simpleSpinner.start();
@@ -99,7 +99,7 @@ export async function action(
     simpleSpinner.stop();
   }
 
-  log('Publish complete');
+  log.log('Publish complete');
   log.newLine();
 
   logManifestUrl({ url, sdkVersion: exp.sdkVersion });
@@ -148,7 +148,7 @@ function assertValidReleaseChannel(releaseChannel?: string): void {
  */
 function logManifestUrl({ url, sdkVersion }: { url: string; sdkVersion?: string }) {
   const manifestUrl = getExampleManifestUrl(url, sdkVersion) ?? url;
-  log(
+  log.log(
     `📝  Manifest: ${log.chalk.bold(TerminalLink.fallbackToUrl(url, manifestUrl))} ${log.chalk.dim(
       TerminalLink.learnMore('https://expo.fyi/manifest-url')
     )}`
@@ -176,7 +176,7 @@ function logProjectPageUrl({
   }
   productionMessage += ` ${log.chalk.dim(TerminalLink.learnMore('https://expo.fyi/project-page'))}`;
 
-  log(productionMessage);
+  log.log(productionMessage);
 }
 
 function getExampleManifestUrl(url: string, sdkVersion: string | undefined): string | null {
