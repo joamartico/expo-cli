@@ -98,7 +98,7 @@ export default class BaseBuilder {
   }
 
   async checkForBuildInProgress() {
-    Log('Checking if there is a build in progress...\n');
+    Log.log('Checking if there is a build in progress...\n');
     const buildStatus = await Project.getBuildStatusAsync(this.projectDir, {
       platform: this.platform(),
       current: true,
@@ -113,7 +113,7 @@ export default class BaseBuilder {
   }
 
   async checkStatus(platform: 'all' | 'ios' | 'android' = 'all'): Promise<void> {
-    Log('Fetching build history...\n');
+    Log.log('Fetching build history...\n');
 
     const buildStatus = await Project.getBuildStatusAsync(this.projectDir, {
       platform,
@@ -126,7 +126,7 @@ export default class BaseBuilder {
     }
 
     if (!(buildStatus.jobs && buildStatus.jobs.length)) {
-      Log('No currently active or previous builds for this project.');
+      Log.log('No currently active or previous builds for this project.');
       return;
     }
 
@@ -139,7 +139,7 @@ export default class BaseBuilder {
   }
 
   async checkStatusBeforeBuild(): Promise<void> {
-    Log('Checking if this build already exists...\n');
+    Log.log('Checking if this build already exists...\n');
 
     const reuseStatus = await Project.findReusableBuildAsync(
       this.options.releaseChannel!,
@@ -169,9 +169,9 @@ Please see the docs (${chalk.underline(
     numberOfRemainingPriorityBuilds?: number;
     hasUnlimitedPriorityBuilds?: boolean;
   }) {
-    Log('=================');
-    Log(' Builds Statuses ');
-    Log('=================\n');
+    Log.log('=================');
+    Log.log(' Builds Statuses ');
+    Log.log('=================\n');
 
     const username = this.manifest.owner
       ? this.manifest.owner
@@ -187,7 +187,7 @@ Please see the docs (${chalk.underline(
         packageExtension = 'APK';
       }
 
-      Log(
+      Log.log(
         `### ${i} | ${platform} | ${UrlUtils.constructBuildLogsUrl({
           buildId: job.id,
           username: username ?? undefined,
@@ -250,15 +250,15 @@ ${job.id}
           break;
       }
 
-      Log(status);
+      Log.log(status);
       if (job.status === 'finished') {
         if (job.artifacts) {
-          Log(`${packageExtension}: ${job.artifacts.url}`);
+          Log.log(`${packageExtension}: ${job.artifacts.url}`);
         } else {
-          Log(`Problem getting ${packageExtension} URL. Please try to build again.`);
+          Log.log(`Problem getting ${packageExtension} URL. Please try to build again.`);
         }
       }
-      Log();
+      Log.log();
     });
   }
 
@@ -275,7 +275,7 @@ ${job.id}
       }
       return ids;
     } else {
-      Log('Looking for releases...');
+      Log.log('Looking for releases...');
       const release = await Project.getLatestReleaseAsync(this.projectDir, {
         releaseChannel: this.options.releaseChannel!,
         platform: this.platform(),
@@ -284,7 +284,7 @@ ${job.id}
       if (!release) {
         throw new BuildError('No releases found. Please create one using `expo publish` first.');
       }
-      Log(
+      Log.log(
         `Using existing release on channel "${release.channel}":\n` +
           `publicationId: ${release.publicationId}\n  publishedTime: ${release.publishedTime}`
       );
@@ -296,7 +296,7 @@ ${job.id}
     buildId: string,
     { interval = 30, publicUrl }: { interval?: number; publicUrl?: string } = {}
   ): Promise<any> {
-    Log(
+    Log.log(
       `Waiting for build to complete.\nYou can press Ctrl+C to exit. It won't cancel the build, you'll be able to monitor it at the printed URL.`
     );
     const spinner = ora().start();
@@ -368,12 +368,12 @@ ${job.id}
 
     const { id: buildId, priority, canPurchasePriorityBuilds } = result;
 
-    Log('Build started, it may take a few minutes to complete.');
-    Log(
+    Log.log('Build started, it may take a few minutes to complete.');
+    Log.log(
       `You can check the queue length at ${chalk.underline(UrlUtils.constructTurtleStatusUrl())}\n`
     );
     if (priority === 'normal' && canPurchasePriorityBuilds) {
-      Log(
+      Log.log(
         'You can make this faster. 🐢\nGet priority builds at: https://expo.io/settings/billing\n'
       );
     }
@@ -386,7 +386,7 @@ ${job.id}
         username: this.manifest.owner || (user?.kind === 'user' ? user.username : undefined),
       });
 
-      Log(`You can monitor the build at\n\n ${chalk.underline(url)}\n`);
+      Log.log(`You can monitor the build at\n\n ${chalk.underline(url)}\n`);
     }
 
     if (this.options.wait) {
@@ -396,9 +396,11 @@ ${job.id}
         ? UrlUtils.constructArtifactUrl(completedJob.artifactId)
         : completedJob.artifacts.url;
       Log.addNewLineIfNone();
-      Log(`${chalk.green('Successfully built standalone app:')} ${chalk.underline(artifactUrl)}`);
+      Log.log(
+        `${chalk.green('Successfully built standalone app:')} ${chalk.underline(artifactUrl)}`
+      );
     } else {
-      Log('Alternatively, run `expo build:status` to monitor it from the command line.');
+      Log.log('Alternatively, run `expo build:status` to monitor it from the command line.');
     }
   }
 
